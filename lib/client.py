@@ -6,14 +6,23 @@
 # changing from six.b to six.u when failing
 # !Awaiting module author to fix the issue from source
 import sys
+reload(sys)  # Reload does the trick!
+sys.setdefaultencoding('UTF8')
 import os
 import six
 import socket
 import websocket
 from socketIO_client import SocketIO, WebsocketTransport
-from py import *
-
-
+import Collector
+import vocabulary
+import formatter
+voc=vocabulary.Vocabulary('/Users/kor/git/aml/examples/aiva/lib/py/lib/definition.yaml')
+defs=Collector.Definifion('/Users/kor/git/aml/examples/aiva/lib/py/lib/api.yaml',voc,load=True)
+defs.load("Organization",{"id":"raml-org"})
+#defs.storeCache()
+print "Saved"
+#from Collector import *;
+import vocabulary;
 def recv_packet_unicode(self):
     try:
         packet_text = self._connection.recv()
@@ -97,7 +106,32 @@ client.on('disconnect', client.disconnect)
 # 2. Write module methods and register as handlers
 ##########################################
 # done in your module scripts
-
+# module method for socketIO
+def classify(msg):
+    d=msg.get("input")
+    if (d=="clear"):
+        result="";
+        for v in range(0,50):
+            result+=" \n"
+        result+='...'
+        header="Clear";
+    else:
+        try:
+            q=defs.query(d);
+            d=defs.executeQuery(d);
+            header=str(q)+" "+str(len(d));
+            result=formatter.format(d)
+        except Exception:
+            d="Exception Happened";
+    reply = {
+        'output': result,
+        'to': msg.get('from'),
+        'header': header,
+        'from': ioid,
+        'hash': msg.get('hash')
+    }
+    # the py client will send this to target <to>
+    return reply
 
 # 3. listener to handle incoming payload.
 ##########################################
@@ -110,10 +144,10 @@ def handle(msg):
     if to is not None and intent is not None:
         # try JSON or JSON.input as input
         try:
-            reply = getAt(getAt(lib_py, to), intent)(msg)
+            reply = classify(msg)
         except Exception:
             try:
-                reply = getAt(getAt(lib_py, to), intent)(msg.get("input"))
+                reply = classify(msg.get("input"))
             except Exception:
                 e = sys.exc_info()[0]
                 print('py handle fails.', e)

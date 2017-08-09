@@ -6,11 +6,32 @@ from autocorrect import spell
 from copy import deepcopy
 from os import path
 from os.path import basename
+#from Collector import query;
+from Collector import *;
+import vocabulary as vocabulary
+voc=vocabulary.Vocabulary('/Users/kor/git/aml/examples/aiva/lib/py/lib/definition.yaml')
+defs=Definifion('/Users/kor/git/aml/examples/aiva/lib/py/lib/api.yaml',voc,load=False)
+defs.storeCache()
+#print module.Entity
+defs.load("Organization",{"id":"raml-org"})
+
+def query(query):
+    return defs.executeQuery(query);
+print "Loaded"
+i=defs.executeQuery("issues")
+assert len(i)==2601
+i=defs.executeQuery("Denis issues")
+assert len(i)==181
+assert(len(defs.executeQuery("open Denis issues"))==18)
+assert (len(defs.executeQuery("closed Denis issues"))==163)
+assert (len(defs.executeQuery("open issues in raml-js-parser-2"))==66)
+assert (len(defs.executeQuery("open issues assigned to Konstantin"))==5)
+assert (len(defs.executeQuery("open issues assigned to Konstantin"))==5)
 
 # the ioid of this script for JSON payload 'from'
 ioid = basename(__file__)  # 'hello.py'
 # Load the spacy english model
-nlp = spacy.load('en')
+#nlp = spacy.load('en')
 
 CONVO_CLASSES_PATH = path.join(
     path.dirname(__file__), '..', '..', 'data', 'convo_classes.json')
@@ -70,12 +91,13 @@ def wordvec_classify(input_str):
 
 def compose_response(convo):
     options = convo['responses']
-    response = np.random.choice(options)
+    response = defs.executeQuery()
     return {
         'score': convo['score'],
         'topic': convo['topic'],
-        'response': response
+        'response': response+'\nSo does this one: <http://www.foo.com|This link>'
     }
+
 
 
 # basic way to classify convo topic

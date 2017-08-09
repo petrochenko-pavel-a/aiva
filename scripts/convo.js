@@ -2,7 +2,6 @@
 // Interface script for convo engine
 const _ = require('lomath')
 const { Chatlog, User } = require('../db/models/index')
-
 /* istanbul ignore next */
 module.exports = (robot) => {
   /* istanbul ignore next */
@@ -11,6 +10,11 @@ module.exports = (robot) => {
       return
     }
     const str = res.match[0].replace(`${robot.name} `, '')
+    global.log.info("AAA")
+    global.log.info(str);
+    if (str.indexOf("Pssst! I didn’t unfurl")==0){
+      return;
+    }
     global.client.pass({
       input: str,
       to: 'convo_classifier.py',
@@ -18,12 +22,28 @@ module.exports = (robot) => {
     })
     .then((reply) => {
       const convo = reply.output
-      global.log.info(`Convo Score ${convo.score}, Topic: ${convo.topic}`)
+      global.log.info(JSON.stringify(convo,null,2))
       if (convo.topic === 'exception') {
-        return
+        res.send("Strange stuff")
+        //return vvv.sampleAtt
       }
-      res.send(convo.response)
-    }).catch(global.log.error)
+      try {
+          res.send({
+              text:"*"+reply.header+"*\n"+convo,
+              // "attachments": [
+              //     {
+              //         "title": "Title",
+              //         "pretext": "Pretext _supports_ mrkdwn",
+              //         "text": convo,
+              //         "mrkdwn_in": ["text", "pretext"]
+              //     }
+              // ]
+          })
+      }catch (e){
+        res.send(Object.keys(robot).join(",")+e.message)
+      }
+      //res.send(convo.response)
+    }).catch((e)=>global.log.info(e))
   })
 
   // catch all chatlogs

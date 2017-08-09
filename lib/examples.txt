@@ -1,0 +1,17 @@
+PC = PN VAL (or VAL)*
+
+CLASS_PREDICATES = CN (PC)* => SELECT CT WHERE (PC*)
+
+repositories where gleb has open tickets assigned to him
+repositories with tickets assigned to gleb created later then two month ago
+
+
+CLASS_PREDICATES1 (or CLASS_PREDICATES^) * = or (CLASS_PREDICATES1,CLASS_PREDICATES^)
+CLASS_PREDICATES1 (and CLASS_PREDICATES^) * = and (CLASS_PREDICATES1,CLASS_PREDICATES^)
+
+
+issues assigned to gleb or issues assigned to denis
+issues assigned to denis or created by gleb
+
+
+CN (PC*)1 (or PC^)* = SELECT * FROM CT WHERE OR (PC*)

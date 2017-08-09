@@ -49,7 +49,7 @@ function startProcess() {
 // primary start method
 function start() {
   return authDb()
-    .then(migrateDb)
+    //.then(migrateDb)
     .then(startProcess)
 }
 

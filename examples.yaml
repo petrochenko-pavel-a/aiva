@@ -1,0 +1,24 @@
+examples:
+ "Who created most of issues in the api workbench repo": "Who P(author) most of C(Issue) in the T(api workbench) repo"
+ "Issues assigned to Denis" : "C(Issues) P(assigned) to T(Denis)"
+ "Issues closed this week" : "C(Issues) P(closed) T(this week)"
+
+ex1:
+ text: "Issues closed this week"
+ translation: "C P V"
+ query: "SELECT * from C where P == V"
+
+ex2:
+ text: "Who closed issues this week"
+ translation: "* (P) (C) (V)"
+ query: "SELECT * from C where P in V"
+
+ex3:
+ text: "Issues closed by denis"
+ translation: "C P V"
+ query: "SELECT * from C where P in V"
+
+ex4:
+  text: "High priority issues closed by denis or konstantin"
+  query: "V P C P V"
+

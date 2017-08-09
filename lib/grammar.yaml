@@ -1,0 +1,28 @@
+rules:
+  pc:
+   definition:  p=pn v=val ( "or" v+=val )*
+   translation: propValueFilter (pn, v)
+   example: issues assigned to gleb or denis
+  por:
+   definition: p=pc ("or" p+=pc ) *
+   translation: or(p)
+   example: assigned to gleb or created by denis
+  pand:
+   definition: p=por ("and" p+=por)*
+   translation: and(p)
+   example:  assigned to gleb and created by denis
+   example2: assigned to gleb or assigned to denis and created by christian
+  cp:
+   definition: (v+=val)* class_name=cn cl+=pand
+   translation: select(class_name) => filter_by_value(v) => cl()
+   example: open issues assigned to gleb or denis and created by christian
+  count:
+   definition: '"how many"| "number of" | "total number of" p=cp '
+   translation: count(cp)
+   example: count open issues in js-parser-2
+  propertyVals:
+   definition: p=pn c=cp
+   translation: map(c,p)
+   example: labels of open issues in java parser
+#
+
