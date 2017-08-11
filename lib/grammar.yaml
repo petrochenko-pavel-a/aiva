@@ -1,28 +1,75 @@
+intros:
+  - "hello"
+  - "hi"
+  - "please tell me"
+  - "who"
+  - "what is"
+  - "what are"
+  - "which"
 rules:
-  pc:
-   definition:  p=pn v=val ( "or" v+=val )*
-   translation: propValueFilter (pn, v)
-   example: issues assigned to gleb or denis
-  por:
-   definition: p=pc ("or" p+=pc ) *
-   translation: or(p)
-   example: assigned to gleb or created by denis
-  pand:
-   definition: p=por ("and" p+=por)*
-   translation: and(p)
-   example:  assigned to gleb and created by denis
-   example2: assigned to gleb or assigned to denis and created by christian
-  cp:
-   definition: (v+=val)* class_name=cn cl+=pand
-   translation: select(class_name) => filter_by_value(v) => cl()
-   example: open issues assigned to gleb or denis and created by christian
-  count:
-   definition: '"how many"| "number of" | "total number of" p=cp '
-   translation: count(cp)
-   example: count open issues in js-parser-2
-  propertyVals:
-   definition: p=pn c=cp
-   translation: map(c,p)
-   example: labels of open issues in java parser
-#
+  - pc:
+     definition:  p=pn v=val ('that'| 'that are')? ( "or" v+=val )*
+     translation: propValueFilter (p, v)
+     example: issues assigned to gleb or denis
+  - pc2:
+     definition: " 'in' v=parentVal"
+     translation: parentValueFilter(v)
+     produces: pc
+     example: issues in raml-js-
+  - por:
+     definition: p=pc ("or" p+=pc ) *
+     translation: or(p)
+     example: assigned to gleb or created by denis
+  - pand:
+     definition: p=por ("and" p+=por)*
+     translation: and(p)
+     example:  assigned to gleb and created by denis
+     example2: assigned to gleb or assigned to denis and created by christian //handle operations priority
+  - cp:
+     definition: (v+=val)* class_name=cn (cl+=pand)?
+     translation: select(class_name) =>filter_by_vals(v) => cl()?
+     example: open issues assigned to gleb or denis and created by christian
+  - count:
+     definition: ' ("how many" | "number of" | "count" | "count of")  p=cp '
+     translation: p() => count()
+     example: count open issues in js-parser-2
+  - whoHave:
+     definition: c1:cp ('who have'|'with') c2: cp
+     translation: hasFilter(p,c2)
+     produces: pc
+     example: created by user who has open issues assigned to him
+#  - nestFilter:
+#     definition: 'p=pn c2=cp'
+#     translation: propValueFilter(p,c2)
+#     produces: pc
+#     example: created by user who has open issues assigned to him
+#  - nestFilter2:
+#     definition: 'c1=cp a=pand'
+#     translation: c1()=>a()
+#     produces: pc
+#     example: created by user who has open issues assigned to him
 
+
+#  propertyVals:
+#   definition: p=pn c=cp
+#   translation: map(c,p)
+#   example: labels of open issues in java parser
+#
+#users who have issues assigned to them and created by Gleb
+
+
+#issues created by users who have issues assigned to them
+
+#open issues in repositories with issues reported by gleb
+#open issues in repositories with issues reported by users who reported more then 5 tickets
+#issues with more then 5 comments
+#please tell me number
+#issues with 5 comments
+#airplanes with maximum speed that is more then 500 km per hour
+
+#Done:
+#issues in raml-js-parser created by gleb or denis
+#issues created by gleb or denis in raml-js-parser
+#issues created by gleb or denis
+
+#users who created more then 5 tickets

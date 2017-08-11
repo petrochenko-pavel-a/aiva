@@ -1,0 +1,88 @@
+intros:
+  - "hello"
+  - "hi"
+  - "please tell me"
+  - "who"
+  - "what is"
+  - "what are"
+  - "which"
+rules:
+  - moreThen:
+      definition: ( "more then" | ">" ) c=selector
+      translation: countCompare(c,'>')
+      produces: filter
+      example: more then 5
+  - lessThen:
+      definition: ( "less then" | "<" ) c=selector
+      translation: countCompare(c,'<')
+      produces: filter
+      example: more then 5
+  - cn2sel:
+      definition: c=cn
+      translation: select(c)
+      produces: selector
+      example: issues
+  - joinSelector:
+      definition: c=selector ("or" c+=selector)+
+      translation: join(c)
+      produces: selector
+      example: issues or bugs
+  - in:
+      definition: ("in"|"at") c=selector
+      translation: partOf(c)
+      example: in raml-js-parser-2
+      produces: filter
+  - pc:
+      definition: p=pn c=selector
+      translation: propertyHasValue(p,c)
+      example: created by gleb
+      produces: filter
+  - pf:
+      definition: p=pn f=filter
+      translation: propertyHasValue(p,f)
+      example: created more then 5
+      produces: filter
+  - not:
+      definition: " 'not' f1=filter "
+      translation: not(f1)
+      example: not created by gleb
+      produces: filter
+  - composition:
+      definition:  f=filter (("," | "and")? f+=filter)+
+      translation: and(f)
+      produces: filter
+      example: created by gleb, assigned to denis
+  - union:
+     definition:  f=filter ("or" f+=filter)+
+     translation: or(f)
+     produces: filter
+     example: created by gleb or assigned to denis
+  - filterToSel:
+     definition: f=filter s=selector
+     translation: f() => in (s)
+     produces: filter
+     example: create more then 5 issues
+  - applyFilter:
+     definition: s=selector f=filter
+     translation: s() => f()
+     example: issues created by gleb
+     produces: selector
+  - compareMoreThen:
+      definition: c0=selector p=pn ( "more" | ">" ) c=selector "then" cz2=selector
+      translation: property(c0(),p)=> in(c) => countCompare(count(flow(property(cz2,p),in(c))),'>')
+      produces: filter
+      example: more then 5
+  - takeProperty:
+     definition: s=selector p=pn
+     translation: property(s,p)
+     example: gleb created
+     produces: selector
+  - takeProperty2:
+     definition: p=pn "of" s=selector
+     translation: property(s,p)
+     example: gleb created
+     produces: selector
+  - count:
+     definition: ' ("how many" | "number of" | "count" | "count of")  p=selector '
+     translation: count(p())
+     example: count open issues in js-parser-2
